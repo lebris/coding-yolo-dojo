@@ -46,7 +46,6 @@ class CashMachine extends Command
             foreach($products as $product)
             {
                 $product = trim($product);
-                //$product = $this->translateProduct($product);
 
                 if ($product === '') {
                     break 2;
