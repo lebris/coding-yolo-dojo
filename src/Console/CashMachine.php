@@ -11,11 +11,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CashMachine extends Command
 {
     private
-        $productPrices;
+        $productPrices,
+        $isCsvAllowed;
 
     public function __construct()
     {
         parent::__construct();
+
+        $this->isCsvAllowed = false;
 
         $this->productPrices = [
             'Apples' => 100,
@@ -32,17 +35,16 @@ class CashMachine extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $helper = new QuestionHelper();
         $list = [];
 
         while (true)
         {
-            $question = new Question(sprintf('Please enter the product name (%s): ', implode(' , ', array_keys($this->productPrices))), '');
-            $products = explode(',', $helper->ask($input, $output, $question));
+            $products = $this->getProducts($input, $output);
 
             foreach($products as $product)
             {
                 $product = trim($product);
+                $product = $this->translateProduct($product);
 
                 if ($product === '') {
                     break 2;
@@ -85,7 +87,7 @@ class CashMachine extends Command
 
                 $packs = intval($qte/2);
 
-                $price -= 30 * $packs;
+                $price -= 20 * $packs;
 
                 return $price;
             },
@@ -100,5 +102,35 @@ class CashMachine extends Command
         }
 
         return $this->productPrices[$item] * $qte;
+    }
+
+    private function getProducts(InputInterface $input, OutputInterface $output)
+    {
+        $helper = new QuestionHelper();
+        $question = new Question(sprintf('Please enter the product name (%s): ', implode(' , ', array_keys($this->productPrices))), '');
+
+        if($this->isCsvAllowed === true)
+        {
+            return explode(',', $helper->ask($input, $output, $question));
+        }
+
+        return [$helper->ask($input, $output, $question)];
+    }
+
+    private function translateProduct($productName)
+    {
+        $translateList = [
+            'Apples' => ['Pommes', 'Mele'],
+        ];
+
+        foreach($translateList as $translation => $words)
+        {
+            if(in_array($productName, $words))
+            {
+                return $translation;
+            }
+        }
+
+        return $productName;
     }
 }
