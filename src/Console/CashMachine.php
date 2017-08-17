@@ -18,10 +18,12 @@ class CashMachine extends Command
     {
         parent::__construct();
 
-        $this->isCsvAllowed = false;
+        $this->isCsvAllowed = true;
 
         $this->productPrices = [
             'Apples' => 100,
+            'Mele' => 100,
+            'Pommes' => 100,
             'Bananas' => 150,
             'Cherries' => 75,
         ];
@@ -44,7 +46,7 @@ class CashMachine extends Command
             foreach($products as $product)
             {
                 $product = trim($product);
-                $product = $this->translateProduct($product);
+                //$product = $this->translateProduct($product);
 
                 if ($product === '') {
                     break 2;
@@ -82,6 +84,18 @@ class CashMachine extends Command
     private function computePrice($item, $qte)
     {
         $discounts = [
+            'Pommes' => function($item, $qte) {
+                $price = intval($qte/3) * 200;
+                $price += $this->productPrices[$item] * ($qte%3);
+
+                return $price;
+            },
+            'Mele' => function($item, $qte) {
+                $price = intval($qte/2) * 100;
+                $price += $this->productPrices[$item] * ($qte%2);
+
+                return $price;
+            },
             'Cherries' => function($item, $qte) {
                 $price = $this->productPrices[$item] * $qte;
 
