@@ -78,7 +78,7 @@ class CashMachine extends Command
             $total += $this->computePrice($item, $qte);
         }
 
-        return $total;
+        return $this->applyGlobalDiscount($total, $list);
     }
 
     private function computePrice($item, $qte)
@@ -110,12 +110,30 @@ class CashMachine extends Command
             },
         ];
 
+        $price = $this->productPrices[$item] * $qte;
         if(array_key_exists($item, $discounts))
         {
-            return $discounts[$item]($item, $qte);
+            $price = $discounts[$item]($item, $qte);
         }
 
-        return $this->productPrices[$item] * $qte;
+        return $price;
+    }
+
+    private function applyGlobalDiscount($price, $items)
+    {
+        $countTotal = 0;
+        $countApple = 0;
+        foreach($items as $product => $qte)
+        {
+            $countTotal += $qte;
+            if ($this->translateProduct($product) === 'Apples') {
+                $countApple += $qte;
+            }
+        }
+        $price -= intval($countTotal/5) * 200;
+        $price -= intval($countApple/4) * 100;
+
+        return $price;
     }
 
     private function getProducts(InputInterface $input, OutputInterface $output)
