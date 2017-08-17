@@ -37,24 +37,30 @@ class CashMachine extends Command
 
         while (true)
         {
-            $question = new Question('Please enter the product name ('. implode(' , ', array_keys($this->productPrices)) .'): ', '');
-            $product = $helper->ask($input, $output, $question);
+            $question = new Question(sprintf('Please enter the product name (%s): ', implode(' , ', array_keys($this->productPrices))), '');
+            $products = explode(',', $helper->ask($input, $output, $question));
 
-            if ($product === '') {
-                break;
-            }
-
-            if(! array_key_exists($product, $this->productPrices))
+            foreach($products as $product)
             {
-                $output->writeln('No product found');
-                continue;
-            }
+                $product = trim($product);
 
-            if(! array_key_exists($product, $list))
-            {
-                $list[$product] = 0;
+                if ($product === '') {
+                    break 2;
+                }
+
+                if(! array_key_exists($product, $this->productPrices))
+                {
+                    $output->writeln('Product ' . $product . ' not found');
+                    continue;
+                }
+
+                if(! array_key_exists($product, $list))
+                {
+                    $list[$product] = 0;
+                }
+                $list[$product] += 1;
+
             }
-            $list[$product] += 1;
 
             $output->writeln($this->computeTotal($list));
         }
