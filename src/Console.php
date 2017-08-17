@@ -19,10 +19,10 @@ class Console
     {
         $this->configuration = $container['configuration'];
 
-        $this->app = new \Onyx\Console\Application();
+        $this->app = new \Onyx\Console\Application($container);
 
         $this->app->add(new RouteLister(new Silex($container)));
-        $this->app->add(new Console\HelloWorld());
+        $this->app->add(new Console\CashMachine());
     }
 
     public function run(): void
