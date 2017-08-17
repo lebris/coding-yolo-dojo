@@ -58,8 +58,8 @@ class CashMachine extends Command
                 {
                     $list[$product] = 0;
                 }
-                $list[$product] += 1;
 
+                $list[$product] += 1;
             }
 
             $output->writeln($this->computeTotal($list));
@@ -85,9 +85,12 @@ class CashMachine extends Command
 
                 $packs = intval($qte/2);
 
-                $price -= 20 * $packs;
+                $price -= 30 * $packs;
 
                 return $price;
+            },
+            'Bananas' => function($item, $qte) {
+                return $this->productPrices[$item] * ceil($qte/2);
             },
         ];
 

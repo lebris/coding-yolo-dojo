@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace Dojo\Domain;
 
-class Cart
+class Cart implements \IteratorAggregate
 {
     private
         $items = [];
 
-    public function add($item)
+    public function add(Item $item)
     {
         if(! array_key_exists($item, $this->items))
         {
@@ -19,5 +19,10 @@ class Cart
         $this->items[$item]++;
 
         return $this;
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->items);
     }
 }
